@@ -1,19 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal" >
 
-    <EditText android:id="@+id/edit_message"
-        android:layout_weight="1"
-        android:layout_width="0dp"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText android:id="@+id/edit_destination"
+        android:layout_alignParentTop="true"
+        android:layout_width="270dp"
         android:layout_height="wrap_content"
-        android:hint="@string/edit_location"/>
+        android:hint="@string/edit_destination"/>
+
+    <Button android:id="@+id/location_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:text="@string/button_find"
+        android:onClick="queryLocation"/>
+
+    <EditText android:id="@+id/edit_origin"
+        android:layout_width="270dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edit_destination"
+        android:hint="@string/edit_origin"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/button_find"
-        android:onClick="queryLocation"/>
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/location_button"
+        android:text="@string/button_find_directions"
+        android:onClick="queryDirections"/>
 
-</LinearLayout>
+</RelativeLayout>

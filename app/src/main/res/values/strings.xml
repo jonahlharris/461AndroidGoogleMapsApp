@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">461Homework4swag</string>
-    <string name="edit_location">Enter a location to find!</string>
+    <string name="edit_destination">Enter a destination to find!</string>
+    <string name="edit_origin">Enter origin: (optional)</string>
     <string name="button_find">Find Location</string>
+    <string name="button_find_directions">Get Directions</string>
     <string name="title_activity_maps">Map</string>
+    <string name="title_activity_directions">Directions</string>
+    <string name="zip_code">Zip Code Not Found</string>
 </resources>

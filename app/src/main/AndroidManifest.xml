@@ -39,7 +39,17 @@
 
         <activity
             android:name=".MapsActivity"
-            android:label="@string/title_activity_maps"></activity>
+            android:label="@string/title_activity_maps">
+        </activity>
+
+        <meta-data
+            android:name="com.google.android.awareness.API_KEY"
+            android:value="@string/google_maps_key"/>
+
+        <activity
+            android:name=".DirectionsActivity"
+            android:label="@string/title_activity_directions">
+        </activity>
     </application>
 
 </manifest>

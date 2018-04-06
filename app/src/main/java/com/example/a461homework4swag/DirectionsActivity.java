@@ -15,51 +15,31 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.DirectionsApi;
 import com.google.maps.GeoApiContext;
+import com.google.maps.android.PolyUtil;
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.TravelMode;
 
 import org.joda.time.DateTime;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.List;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class DirectionsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+        setContentView(R.layout.activity_directions);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+                .findFragmentById(R.id.directions);
         mapFragment.getMapAsync(this);
-    }
-
-    public Address getLocationFromAddress(Context context, String strAddress) {
-
-        Geocoder coder = new Geocoder(context);
-        List<Address> address;
-        Address location = null;
-
-        try {
-            // May throw an IOException
-            address = coder.getFromLocationName(strAddress, 5);
-            if (address == null || address.isEmpty()) {
-                return null;
-            }
-
-            location = address.get(0);
-
-        } catch (IOException ex) {
-
-            ex.printStackTrace();
-        }
-
-        return location;
     }
 
 
@@ -77,26 +57,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
         Intent intent = getIntent();
-        String location_string = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
+        String destination_string = intent.getStringExtra("destination");
+        String origin_string = intent.getStringExtra("origin");
 
-
-
-        // Add a marker in Sydney and move the camera
-        //LatLng sydney = new LatLng(-34, 151);
+        GeoApiContext geo = new GeoApiContext().setApiKey(getString(R.string.google_maps_key));
+        DateTime now = new DateTime();
+        DirectionsResult directions = null;
         try {
-            Address location = getLocationFromAddress(this.getApplicationContext(), location_string);
-            LatLng p1;
-            p1 = new LatLng(location.getLatitude(), location.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(p1).title(location.getAddressLine(0)));
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(p1, 5));
-            TextView textView = (TextView) findViewById(R.id.zip_code);
-
-            String zipCode = null;
-            if (location != null && location.getPostalCode() != null)
-                zipCode = "Zip Code: " + location.getPostalCode();
-            else
-                zipCode = "Zip Code Not Found!";
-            textView.setText(zipCode);
+            directions = DirectionsApi.newRequest(geo).mode(TravelMode.DRIVING).origin(origin_string).destination(destination_string).departureTime(now).await();
+            LatLng startCoords = new LatLng(directions.routes[0].legs[0].startLocation.lat, directions.routes[0].legs[0].startLocation.lng);
+            mMap.addMarker(new MarkerOptions().position(startCoords).title(directions.routes[0].legs[0].startAddress));
+            LatLng endCoords = new LatLng(directions.routes[0].legs[0].endLocation.lat, directions.routes[0].legs[0].endLocation.lng);
+            mMap.addMarker(new MarkerOptions().position(endCoords).title(directions.routes[0].legs[0].endAddress).snippet(getEndLocationTitle(directions)));
+            List<LatLng> decodedPath = PolyUtil.decode(directions.routes[0].overviewPolyline.getEncodedPath());
+            mMap.addPolyline(new PolylineOptions().addAll(decodedPath));
+            LatLng middle = new LatLng((startCoords.latitude + endCoords.latitude) / 2, (startCoords.longitude + endCoords.longitude) / 2);
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(middle));
+            System.out.println ("Snippet: " + getEndLocationTitle(directions));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -110,4 +87,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void zoomOut(View view) {
         mMap.moveCamera(CameraUpdateFactory.zoomOut());
     }
+
+    private String getEndLocationTitle(DirectionsResult results){
+        return  "Time :"+ results.routes[0].legs[0].duration.humanReadable +
+                " Distance :" + results.routes[0].legs[0].distance.humanReadable;
+    }
+
 }

@@ -21,21 +21,23 @@ public class MainActivity extends AppCompatActivity {
     /** Called when the user clicks the Find Location button */
     public void queryLocation(View view){
 
-//        Uri gmmIntentUri = Uri.parse("google.streetview:cbll=46.414382,10.013988");
-//
-//        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-//        mapIntent.setPackage("com.google.android.apps.maps");
-//        startActivity(mapIntent);
-//        if (mapIntent.resolveActivity(getPackageManager()) != null) {
-//            startActivity(mapIntent);
-//        }
-
         Intent intent = new Intent(this, MapsActivity.class);
-        EditText editText =(EditText) findViewById(R.id.edit_message);
+        EditText editText =(EditText) findViewById(R.id.edit_destination);
         String message = editText.getText().toString();
         intent.putExtra(EXTRA_MESSAGE, message);
         startActivity(intent);
 
+    }
+
+    public void queryDirections (View view){
+        Intent intent = new Intent(this, DirectionsActivity.class);
+        EditText editText =(EditText) findViewById(R.id.edit_destination);
+        String message = editText.getText().toString();
+        intent.putExtra("destination", message);
+        editText =(EditText) findViewById(R.id.edit_origin);
+        message = editText.getText().toString();
+        intent.putExtra("origin", message);
+        startActivity(intent);
     }
 
 }
